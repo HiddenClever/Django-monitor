@@ -36,7 +36,7 @@ def get_monitor_entry(obj):
 def nq(
     model, rel_fields = [], can_delete_approved = True, long_desc=None,
     manager_name = 'objects', status_name = 'status',
-    monitor_name = 'monitor_entry', base_manager = None
+    monitor_name = 'monitor_entry', base_manager = None, notify_moderators=None
 ):
     """ Register(enqueue) the model for moderation."""
     if not model_from_queue(model):
@@ -55,7 +55,8 @@ def nq(
             'manager_name': manager_name,
             'status_name': status_name,
             'monitor_name': monitor_name,
-            'long_desc': long_desc or _default_long_desc
+            'long_desc': long_desc or _default_long_desc,
+            'notify_moderators': notify_moderators,
         }
 
 post_moderation = Signal(providing_args = ["instance"])

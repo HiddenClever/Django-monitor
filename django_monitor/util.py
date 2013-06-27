@@ -276,7 +276,7 @@ def save_handler(sender, instance, **kwargs):
             # message
             message = _long_desc(instance, long_desc)
             if status == 'Pending':
-                message += "\n\nTo moderate, go to http://%s/%s" % (domain, reverse('admin:hub_%s_changelist' % instance_class.lower()))
+                message += "\n\nTo moderate, go to http://%s%s?ot=desc&status=IP&o=2" % (domain, reverse('admin:hub_%s_changelist' % instance_class.lower()))
 
             # subject
             key = "%s:%s" % (instance_class, status)
