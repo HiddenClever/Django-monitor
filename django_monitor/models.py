@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 import datetime
@@ -28,7 +28,7 @@ class MonitorEntry(models.Model):
         auto_now_add = True, blank = True, null = True
     )
     status = models.CharField(max_length = 2, choices = STATUS_CHOICES)
-    status_by = models.ForeignKey(User, blank = True, null = True)
+    status_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True)
     status_date = models.DateTimeField(blank = True, null = True)
     notes = models.CharField(max_length = 100, blank = True)
 
