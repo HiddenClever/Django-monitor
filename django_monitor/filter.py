@@ -9,12 +9,13 @@ class MonitorFilter(ChoicesFieldListFilter):
     Django development version has changes in store to break this!
     """
     def __init__(
-        self, f, request, params, model, model_admin, field_path = None
+        self, field, request, params, model, model_admin, field_path = None
     ):
-        ChoicesFilterSpec.__init__(
-            self, f, request, params, model, model_admin, field_path
+        ChoicesFieldListFilter.__init__(
+            self, field, request, params, model, model_admin, field_path
         )
         self.lookup_kwarg = 'status'
+        self.title = _("Moderation status")
         # usually, lookup_vals are extracted from request.GET. But we have
         # intentionally removed ``status`` from GET before.
         # (Have a look at ``django_monitor.admin.MonitorAdmin.queryset`` to
@@ -39,8 +40,4 @@ class MonitorFilter(ChoicesFieldListFilter):
                 'query_string': cl.get_query_string({self.lookup_kwarg: val}),
                 'display': STATUS_DICT[val]
             }
-
-    def title(self):
-        """ The title displayed above the filter"""
-        return _("Moderation status")
 
