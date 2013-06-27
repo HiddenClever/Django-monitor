@@ -9,6 +9,7 @@ from django_monitor.models import MonitorEntry, MONITOR_TABLE
 from django_monitor.conf import (
     STATUS_DICT, PENDING_STATUS, APPROVED_STATUS, CHALLENGED_STATUS
 )
+import sys
 
 def create_moderate_perms(app, created_models, verbosity, **kwargs):
     """ This will create moderate permissions for all registered models"""
@@ -42,29 +43,29 @@ def add_fields(cls, manager_name, status_name, monitor_name, base_manager):
     class CustomQuerySet(base_queryset):
         """ Chainable queryset for checking status """
        
-        def _by_status(self, field_name, status):
+        def _by_status(self, status):
             """ Filter queryset by given status"""
-            where_clause = '%s = %%s' % (field_name)
+            where_clause = '%s.status = %%s' % MONITOR_TABLE
             return self.extra(where = [where_clause], params = [status])
 
         def approved(self):
             """ All approved objects"""
-            return self._by_status(status_name, APPROVED_STATUS)
+            return self._by_status(APPROVED_STATUS)
 
         def exclude_approved(self):
             """ All not-approved objects"""
-            where_clause = '%s != %%s' % (status_name)
+            where_clause = '%s.status != %%s' % MONITOR_TABLE
             return self.extra(
                 where = [where_clause], params = [APPROVED_STATUS]
             )
 
         def pending(self):
             """ All pending objects """
-            return self._by_status(status_name, PENDING_STATUS)
+            return self._by_status(PENDING_STATUS)
 
         def challenged(self):
             """ All challenged objects """
-            return self._by_status(status_name, CHALLENGED_STATUS)
+            return self._by_status(CHALLENGED_STATUS)
 
     class CustomManager(base_manager):
         """ custom manager that adds parameters and uses custom QuerySet """
@@ -100,11 +101,12 @@ def add_fields(cls, manager_name, status_name, monitor_name, base_manager):
             return CustomQuerySet(self.model, q.query)
 
         def __getattr__(self, attr):
-            """ Try to get the rest of attributes from queryset """
-            try:
-                return getattr(self, attr)
-            except AttributeError:
-                return getattr(self.get_query_set(), attr)
+#             """ Try to get the rest of attributes from queryset """
+#             try:
+#                 print >>sys.stderr, attr
+#                 return getattr(self, attr)
+#             except AttributeError:
+            return getattr(self.get_query_set(), attr)
 
     def _get_monitor_status(self):
         """
