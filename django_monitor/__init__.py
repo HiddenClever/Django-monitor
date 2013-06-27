@@ -40,7 +40,7 @@ def nq(
         signals.post_save.connect(save_handler, sender = model)
         signals.pre_delete.connect(delete_handler, sender = model)
         registered_model = get_model(
-            model._meta.app_label, model._meta.object_name, False
+            model._meta.app_label, model._meta.object_name, only_installed=False
         )
         add_fields(
             registered_model, manager_name, status_name,
