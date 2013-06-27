@@ -223,6 +223,8 @@ def save_handler(sender, instance, **kwargs):
 
     # Create corresponding monitor entry
     if kwargs.get('created', None):
+        from django_monitor import _queue
+        
         me = MonitorEntry.objects.create(
             status = status,
             content_object = instance,
@@ -257,10 +259,13 @@ def save_handler(sender, instance, **kwargs):
                 if rel_obj:
                     moderate_rel_objects(rel_obj, status, user)
                     
+        if callable(_queue[instance.__class__]['notify_moderators']):
+            if not _queue[instance.__class__]['notify_moderators'](instance):
+                return
+
         if MODERATOR_LIST:
 
             from django.contrib.sites.models import Site
-            from django_monitor import _queue
             domain = Site.objects.get(id=settings.SITE_ID).domain
 
             status = me.get_status_display()
