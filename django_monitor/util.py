@@ -126,7 +126,7 @@ def add_fields(cls, manager_name, status_name, monitor_name, base_manager):
     def _get_status_display(self):
         """ to display the moderation status in verbose """
         return STATUS_DICT[self.monitor_status]
-    _get_status_display.short_description = status_name
+    _get_status_display.short_description = status_name.replace('_', ' ')
 
     def moderate(self, status, user = None, notes = ''):
         """ developers may use this to moderate objects """
