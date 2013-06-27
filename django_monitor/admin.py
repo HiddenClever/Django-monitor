@@ -1,7 +1,7 @@
 
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import admin
-from django.contrib.admin.filterspecs import FilterSpec
+from django.contrib.admin.filters import FieldListFilter
 from django.shortcuts import render_to_response
 from django.utils.functional import update_wrapper
 from django.template import RequestContext
@@ -19,9 +19,7 @@ from django_monitor.conf import (
 from django_monitor.models import MonitorEntry
 
 # Our objective is to place the custom monitor-filter on top
-FilterSpec.filter_specs.insert(
-    0, (lambda f: getattr(f, 'monitor_filter', False), MonitorFilter)
-)
+FieldListFilter.register(lambda f: getattr(f, 'monitor_filter', False), MonitorFilter)
 
 
 class MEAdmin(admin.ModelAdmin):

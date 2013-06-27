@@ -1,9 +1,9 @@
-from django.contrib.admin.filterspecs import ChoicesFilterSpec
+from django.contrib.admin.filters import ChoicesFieldListFilter
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
 from django_monitor.conf import STATUS_DICT
 
-class MonitorFilter(ChoicesFilterSpec):
+class MonitorFilter(ChoicesFieldListFilter):
     """
     A custom filterspec to enable filter by monitor-status.
     Django development version has changes in store to break this!
