@@ -11,7 +11,6 @@ from django_monitor.middleware import get_current_user
 from django_monitor.models import MonitorEntry, MONITOR_TABLE
 
 
-
 def _long_desc(obj, long_desc):
     if callable(long_desc):
         return long_desc(obj)
@@ -112,11 +111,6 @@ def add_fields(cls, manager_name, status_name, monitor_name, base_manager):
             return CustomQuerySet(self.model, q.query)
 
         def __getattr__(self, attr):
-#             """ Try to get the rest of attributes from queryset """
-#             try:
-#                 print >>sys.stderr, attr
-#                 return getattr(self, attr)
-#             except AttributeError:
             return getattr(self.get_query_set(), attr)
 
     def _get_monitor_status(self):
