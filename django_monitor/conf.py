@@ -1,3 +1,5 @@
+from django.conf import settings
+
 """
 All status labels defined here.
 """
@@ -15,3 +17,4 @@ STATUS_DICT = {
     CHALLENGED_STATUS: CHALLENGED_DESCR
 }
 
+MODERATOR_LIST = getattr(settings, "MONITOR_MODERATOR_LIST", [])

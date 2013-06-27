@@ -1,15 +1,26 @@
 
 from datetime import datetime
-
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.core.urlresolvers import reverse
+from django.core.mail import send_mail
 from django.db.models import Manager
-
+from django_monitor.conf import STATUS_DICT, PENDING_STATUS, APPROVED_STATUS, \
+    CHALLENGED_STATUS, MODERATOR_LIST
 from django_monitor.middleware import get_current_user
 from django_monitor.models import MonitorEntry, MONITOR_TABLE
-from django_monitor.conf import (
-    STATUS_DICT, PENDING_STATUS, APPROVED_STATUS, CHALLENGED_STATUS
-)
-import sys
+
+
+
+def _long_desc(obj, long_desc):
+    if callable(long_desc):
+        return long_desc(obj)
+    attr = getattr(obj, long_desc, None)
+    if attr:
+        if callable(attr):
+            return attr(obj)
+        return unicode(attr)
+    return unicode(obj)
 
 def create_moderate_perms(app, created_models, verbosity, **kwargs):
     """ This will create moderate permissions for all registered models"""
@@ -251,6 +262,32 @@ def save_handler(sender, instance, **kwargs):
                 rel_obj = getattr(instance, rel_name, None)
                 if rel_obj:
                     moderate_rel_objects(rel_obj, status, user)
+                    
+        if MODERATOR_LIST:
+
+            from django.contrib.sites.models import Site
+            from django_monitor import _queue
+            domain = Site.objects.get(id=settings.SITE_ID).domain
+
+            status = me.get_status_display()
+            instance_class = instance.__class__.__name__
+            long_desc = _queue[instance.__class__]['long_desc']
+
+            # message
+            message = _long_desc(instance, long_desc)
+            if status == 'Pending':
+                message += "\n\nTo moderate, go to http://%s/%s" % (domain, reverse('admin:hub_%s_changelist' % instance_class.lower()))
+
+            # subject
+            key = "%s:%s" % (instance_class, status)
+#             if me.moderation_status_by and me.moderation_status_by.username == 'gatekeeper_automod':
+#                 key = "%s:auto" % key
+            subject = "[%s] New monitor object on %s" % (key, domain)
+
+            # sender
+            from_addr = settings.DEFAULT_FROM_EMAIL
+
+            send_mail(subject, message, from_addr, MODERATOR_LIST, fail_silently=True)
 
 def moderate_rel_objects(given, status, user = None):
     """
