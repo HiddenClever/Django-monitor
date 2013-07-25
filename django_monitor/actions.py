@@ -1,14 +1,13 @@
-
-from django.core.exceptions import PermissionDenied
+import sys
 from django.contrib.admin.util import model_ngettext
+from django.core.exceptions import PermissionDenied
 from django.utils.translation import ugettext_lazy, ugettext as _
-
-from django_monitor.util import moderate_rel_objects
 from django_monitor import model_from_queue
-from django_monitor.conf import (
-    STATUS_DICT, PENDING_STATUS, APPROVED_STATUS, CHALLENGED_STATUS
-)
+from django_monitor.conf import STATUS_DICT, PENDING_STATUS, APPROVED_STATUS, \
+    CHALLENGED_STATUS
 from django_monitor.models import MonitorEntry
+from django_monitor.util import moderate_rel_objects
+
 
 def moderate_selected(modeladmin, request, queryset, status):
     """
@@ -34,7 +33,7 @@ def moderate_selected(modeladmin, request, queryset, status):
         raise PermissionDenied
 
     # Approved objects can not further be moderated.
-    queryset = queryset.exclude_approved()
+#     queryset = queryset.exclude_approved()
 
     # After moderating objects in queryset, moderate related objects also
     q_count = queryset.count()
@@ -89,6 +88,7 @@ challenge_selected.short_description = ugettext_lazy(
 def reset_to_pending(modeladmin, request, queryset):
     """ Default action to reset selected object's status to pending """
     ip_count = moderate_selected(modeladmin, request, queryset, PENDING_STATUS)
+    print >>sys.stderr, queryset
     if ip_count:
         modeladmin.message_user(
             request,
