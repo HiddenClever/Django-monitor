@@ -263,7 +263,7 @@ def save_handler(sender, instance, **kwargs):
             if not _queue[instance.__class__]['notify_moderators'](instance):
                 return
 
-        if MODERATOR_LIST:
+        if MONITOR_MODERATOR_LIST:
 
             from django.contrib.sites.models import Site
             domain = Site.objects.get(id=settings.SITE_ID).domain
