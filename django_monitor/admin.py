@@ -114,7 +114,7 @@ class MonitorAdmin(admin.ModelAdmin):
     """ModelAdmin for monitored models should inherit this."""
 
     # Which fields are to be made readonly after approval.
-    protected_fields = ()
+    protected_fields = []
 
     def __init__(self, model, admin_site):
         """ Overridden to add a custom filter to list_filter """
