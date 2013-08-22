@@ -160,7 +160,7 @@ class MonitorAdmin(admin.ModelAdmin):
             self.is_monitored() and 
             obj is not None and obj.is_approved
         ):
-            return self.readonly_fields + self.protected_fields
+            return list(self.readonly_fields) + list(self.protected_fields)
         return self.readonly_fields
 
     def get_actions(self, request):
