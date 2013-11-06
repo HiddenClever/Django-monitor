@@ -6,6 +6,7 @@ __license__ = "BSD"
 from django.db.models import signals
 from django.db.models.loading import get_model
 from django.dispatch import Signal
+from django_monitor.models import MonitorEntry
 from django_monitor.conf import PENDING_STATUS
 from django_monitor.util import create_moderate_perms, add_fields, save_handler, \
     delete_handler
