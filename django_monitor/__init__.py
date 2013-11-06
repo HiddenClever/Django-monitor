@@ -3,13 +3,14 @@ __version__ = "0.2"
 __copyright__ = "Copyright (c) 2011 Rajeesh"
 __license__ = "BSD"
 
-from django.dispatch import Signal
 from django.db.models import signals
 from django.db.models.loading import get_model
+from django.dispatch import Signal
+from django_monitor.conf import PENDING_STATUS
+from django_monitor.util import create_moderate_perms, add_fields, save_handler, \
+    delete_handler
+    
 
-from django_monitor.util import (
-    create_moderate_perms, add_fields, save_handler, delete_handler
-)
 
 def _default_long_desc(obj):
     return unicode(obj)
@@ -34,7 +35,7 @@ def get_monitor_entry(obj):
     return getattr(obj, model_dict['monitor_name']) if model_dict else None
 
 def nq(
-    model, rel_fields = [], can_delete_approved = True, long_desc=None,
+    model, rel_fields = [], import_unmoderated=False, can_delete_approved = True, long_desc=None,
     manager_name = 'objects', status_name = 'status',
     monitor_name = 'monitor_entry', base_manager = None, notify_moderators=None
 ):
@@ -58,6 +59,19 @@ def nq(
             'long_desc': long_desc or _default_long_desc,
             'notify_moderators': notify_moderators,
         }
+        if import_unmoderated:
+            try:
+                mod_obj_ids = model.objects.all().values_list('pk', flat=True)
+                unmod_objs = model._base_manager.exclude(pk__in=mod_obj_ids)
+                print 'importing %s unmoderated objects...' % unmod_objs.count()
+                for obj in unmod_objs:
+                    me = MonitorEntry(
+                        status=PENDING_STATUS,
+                        content_object=obj,
+                        timestamp=datetime.datetime.now())
+                    me.save()
+            except:
+                pass
 
 post_moderation = Signal(providing_args = ["instance"])
 
