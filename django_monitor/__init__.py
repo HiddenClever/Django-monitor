@@ -62,19 +62,18 @@ def nq(
             'notify_moderators': notify_moderators,
         }
         if import_unmoderated:
-#             try:
-            mod_obj_ids = model.objects.all().values_list('pk', flat=True)
-            print mod_obj_ids
-            unmod_objs = model._base_manager.exclude(pk__in=mod_obj_ids)
-            print 'importing %s unmoderated objects...' % unmod_objs.count()
-            for obj in unmod_objs:
-                me = MonitorEntry(
-                    status=PENDING_STATUS,
-                    content_object=obj,
-                    status_date=datetime.datetime.now())
-                me.save()
-#             except:
-#                 pass
+            try:
+                mod_obj_ids = model.objects.all().values_list('pk', flat=True)
+                unmod_objs = model._base_manager.exclude(pk__in=mod_obj_ids)
+                print 'importing %s unmoderated objects...' % unmod_objs.count()
+                for obj in unmod_objs:
+                    me = MonitorEntry(
+                        status=PENDING_STATUS,
+                        content_object=obj,
+                        status_date=datetime.datetime.now())
+                    me.save()
+            except:
+                pass
 
 post_moderation = Signal(providing_args = ["instance"])
 
