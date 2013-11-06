@@ -28,7 +28,8 @@ class MonitorEntry(models.Model):
         auto_now_add = True, blank = True, null = True
     )
     status = models.CharField(max_length = 2, choices = STATUS_CHOICES)
-    status_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True)
+    status_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True,
+                                  on_delete=models.SET_NULL)
     status_date = models.DateTimeField(blank = True, null = True)
     notes = models.CharField(max_length = 100, blank = True)
 
